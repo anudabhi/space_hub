@@ -1,0 +1,30 @@
+<div class="card border-0 shadow-sm mb-3">
+  <div class="card-body d-flex gap-3 align-items-start">
+    <% if booking.listing.photos.attached? %>
+      <%= image_tag booking.listing.cover_photo, class: "rounded", style: "width:80px;height:60px;object-fit:cover;", alt: booking.listing.title %>
+    <% else %>
+      <div class="rounded bg-light d-flex align-items-center justify-content-center" style="width:80px;height:60px;font-size:1.8rem;">
+        <%= booking.listing.category == "wellness" ? "🧘" : booking.listing.category == "creative" ? "🎨" : "🎉" %>
+      </div>
+    <% end %>
+    <div class="flex-grow-1">
+      <div class="d-flex justify-content-between">
+        <h6 class="fw-bold mb-1"><%= booking.listing.title %></h6>
+        <span class="badge bg-<%= booking.status == 'confirmed' ? 'success' : booking.status == 'pending' ? 'warning text-dark' : booking.status == 'cancelled' ? 'danger' : 'secondary' %>">
+          <%= booking.status.capitalize %>
+        </span>
+      </div>
+      <p class="text-muted small mb-1">
+        <i class="bi bi-calendar3"></i> <%= booking.start_time.strftime("%d %b %Y, %I:%M %p") %> –
+        <%= booking.end_time.strftime("%I:%M %p") %>
+      </p>
+      <p class="small mb-0">
+        <strong>₹<%= number_with_delimiter(booking.total_price.to_i) %></strong>
+        <span class="text-muted">· <%= booking.hours_duration %>hr</span>
+      </p>
+    </div>
+    <div>
+      <%= link_to "View", guest_booking_path(booking), class: "btn btn-outline-secondary btn-sm" %>
+    </div>
+  </div>
+</div>

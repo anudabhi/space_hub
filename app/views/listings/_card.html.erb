@@ -1,0 +1,30 @@
+<div class="card h-100 border-0 shadow-sm listing-card">
+  <%= link_to listing_path(listing), class: "text-decoration-none text-dark" do %>
+    <% if listing.photos.attached? %>
+      <%= image_tag listing.cover_photo, class: "card-img-top", style: "height:200px;object-fit:cover;", alt: listing.title %>
+    <% else %>
+      <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+        <% icon = listing.category == "wellness" ? "🧘" : listing.category == "creative" ? "🎨" : "🎉" %>
+        <span style="font-size:3rem;"><%= icon %></span>
+      </div>
+    <% end %>
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-1">
+        <span class="badge bg-secondary text-capitalize"><%= listing.category %></span>
+        <% if listing.avg_rating.to_f > 0 %>
+          <span class="small text-warning fw-semibold">
+            ★ <%= listing.avg_rating %> <span class="text-muted fw-normal">(<%= listing.reviews_count %>)</span>
+          </span>
+        <% end %>
+      </div>
+      <h6 class="card-title fw-bold mt-2 mb-1"><%= listing.title %></h6>
+      <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> <%= listing.city %></p>
+      <p class="text-muted small mb-0 text-truncate"><%= listing.description.to_s.first(80) %>...</p>
+    </div>
+    <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
+      <strong class="text-dark">₹<%= number_with_delimiter(listing.price_per_hour.to_i) %></strong>
+      <span class="text-muted small">/hr</span>
+      <span class="text-muted small float-end"><i class="bi bi-people"></i> Up to <%= listing.capacity %></span>
+    </div>
+  <% end %>
+</div>

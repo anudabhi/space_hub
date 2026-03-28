@@ -1,0 +1,113 @@
+<% content_for :title, "Browse Spaces — SpaceHub India" %>
+
+<div class="bg-light border-bottom py-4">
+  <div class="container">
+    <h1 class="h3 fw-bold mb-3">Browse Spaces</h1>
+    <%= search_form_for @q, url: listings_path, method: :get do |f| %>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <%= f.search_field :title_or_description_cont,
+                placeholder: "Search spaces...",
+                class: "form-control" %>
+        </div>
+        <div class="col-md-2">
+          <%= select_tag :city,
+                options_for_select([["All Cities", ""]] + Listing::CITIES.map { |c| [c, c] }, params[:city]),
+                class: "form-select" %>
+        </div>
+        <div class="col-md-2">
+          <%= select_tag :category,
+                options_for_select([["All Types", ""]] + Listing::CATEGORIES.map { |c| [c.capitalize, c] }, params[:category]),
+                class: "form-select" %>
+        </div>
+        <div class="col-md-2">
+          <%= date_field_tag :date, params[:date],
+                class: "form-control",
+                min: Date.today.to_s,
+                title: "Show only spaces available on this date" %>
+        </div>
+        <div class="col-md-1">
+          <%= number_field_tag :min_capacity, params[:min_capacity],
+                class: "form-control", placeholder: "Guests", min: 1 %>
+        </div>
+        <div class="col-md-1">
+          <%= f.submit "Search", class: "btn btn-dark w-100" %>
+        </div>
+        <div class="col-md-1">
+          <%= link_to "Clear", listings_path, class: "btn btn-outline-secondary w-100" %>
+        </div>
+      </div>
+
+      <!-- Price range slider -->
+      <% ceiling = [@max_price_ceiling, 5000].max %>
+      <div class="row g-2 align-items-center mt-2" data-controller="price-range">
+        <div class="col-auto text-muted small fw-semibold">Price/hr:</div>
+        <div class="col-auto">
+          <input type="range" class="form-range" style="width:130px;"
+                 min="0" max="<%= ceiling %>" step="100"
+                 value="<%= params[:min_price].presence || 0 %>"
+                 data-price-range-target="minSlider"
+                 data-action="input->price-range#update">
+        </div>
+        <span class="col-auto small fw-semibold" data-price-range-target="minDisplay">
+          ₹<%= params[:min_price].presence || "0" %>
+        </span>
+        <div class="col-auto text-muted small">–</div>
+        <div class="col-auto">
+          <input type="range" class="form-range" style="width:130px;"
+                 min="0" max="<%= ceiling %>" step="100"
+                 value="<%= params[:max_price].presence || ceiling %>"
+                 data-price-range-target="maxSlider"
+                 data-action="input->price-range#update">
+        </div>
+        <span class="col-auto small fw-semibold" data-price-range-target="maxDisplay">
+          ₹<%= params[:max_price].presence || ceiling %>
+        </span>
+        <input type="hidden" name="min_price" value="<%= params[:min_price] %>"
+               data-price-range-target="minInput">
+        <input type="hidden" name="max_price" value="<%= params[:max_price] %>"
+               data-price-range-target="maxInput">
+      </div>
+
+      <!-- Active filter badges -->
+      <% active_filters = [
+           params[:city].presence && "City: #{params[:city]}",
+           params[:category].presence && "Type: #{params[:category].capitalize}",
+           params[:date].presence && "Available: #{params[:date]}",
+           (params[:min_capacity].to_i > 1) && "Min #{params[:min_capacity]} guests",
+           (params[:min_price].to_i > 0) && "From ₹#{params[:min_price]}/hr",
+           (params[:max_price].present? && params[:max_price].to_i < ceiling) && "Up to ₹#{params[:max_price]}/hr",
+           params.dig(:q, :title_or_description_cont).presence && "\"#{params.dig(:q, :title_or_description_cont)}\"",
+         ].compact %>
+      <% if active_filters.any? %>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          <% active_filters.each do |label| %>
+            <span class="badge bg-dark rounded-pill"><%= label %></span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="container py-4">
+  <% if @listings.any? %>
+    <p class="text-muted small mb-3"><%= @pagy.count %> space<%= @pagy.count == 1 ? "" : "s" %> found</p>
+    <div class="row g-4">
+      <% @listings.each do |listing| %>
+        <div class="col-md-6 col-lg-4">
+          <%= render "card", listing: listing %>
+        </div>
+      <% end %>
+    </div>
+    <div class="mt-4 d-flex justify-content-center">
+      <%== pagy_bootstrap_nav(@pagy) %>
+    </div>
+  <% else %>
+    <div class="text-center py-5 text-muted">
+      <div class="display-4 mb-3">🔍</div>
+      <h5>No spaces found</h5>
+      <p>Try adjusting your filters or <%= link_to "clear search", listings_path %>.</p>
+    </div>
+  <% end %>
+</div>

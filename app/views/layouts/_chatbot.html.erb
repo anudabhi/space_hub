@@ -1,0 +1,80 @@
+<div data-controller="chatbot"
+     style="position:fixed; bottom:24px; right:24px; z-index:1050;">
+
+  <!-- Chat window -->
+  <div data-chatbot-target="window"
+       class="d-none card border-0 shadow-lg mb-3"
+       style="width:340px; height:480px; display:flex; flex-direction:column; border-radius:16px; overflow:hidden;">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-2 px-3 py-3 bg-dark text-white">
+      <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+           style="width:32px; height:32px; font-size:0.9rem;">S</div>
+      <div class="flex-grow-1">
+        <div class="fw-semibold" style="font-size:0.9rem;">SpaceBot</div>
+        <div class="text-secondary" style="font-size:0.7rem;">Powered by Gemini AI</div>
+      </div>
+      <button class="btn btn-link text-white p-0"
+              data-action="click->chatbot#toggle">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div data-chatbot-target="messages"
+         class="flex-grow-1 overflow-auto px-3 py-3"
+         style="background:#fafafa;">
+    </div>
+
+    <!-- Suggestion chips -->
+    <div data-chatbot-target="suggestions"
+         class="px-3 pb-2 d-flex flex-wrap gap-1"
+         style="background:#fafafa;">
+      <% [
+        "Find a wellness space in Mumbai",
+        "Creative studios in Bangalore",
+        "Event venue for 50 people",
+        "How does booking work?",
+        "What payment methods are accepted?",
+        "Can I cancel a booking?",
+      ].each do |prompt| %>
+        <button class="btn btn-outline-secondary btn-sm"
+                style="font-size:0.7rem; border-radius:20px; padding:3px 10px;"
+                data-action="click->chatbot#suggest"
+                data-prompt="<%= prompt %>">
+          <%= prompt %>
+        </button>
+      <% end %>
+    </div>
+
+    <!-- Input -->
+    <div class="px-3 py-2 border-top bg-white d-flex gap-2 align-items-end">
+      <textarea data-chatbot-target="input"
+                data-action="keydown->chatbot#keydown"
+                class="form-control form-control-sm"
+                rows="1"
+                placeholder="Ask me anything..."
+                style="resize:none; border-radius:20px;"></textarea>
+      <button class="btn btn-dark btn-sm flex-shrink-0"
+              data-action="click->chatbot#send"
+              style="border-radius:50%; width:34px; height:34px; padding:0;">
+        <i class="bi bi-send-fill" style="font-size:0.8rem;"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Floating bubble -->
+  <div class="position-relative d-inline-block">
+    <button class="btn btn-dark shadow-lg d-flex align-items-center justify-content-center"
+            data-action="click->chatbot#toggle"
+            style="width:56px; height:56px; border-radius:50%; font-size:1.4rem;"
+            title="Chat with SpaceBot">
+      <i class="bi bi-robot"></i>
+    </button>
+    <!-- Unread badge -->
+    <span data-chatbot-target="badge"
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+          style="font-size:0.6rem;">1</span>
+  </div>
+
+</div>

@@ -1,0 +1,80 @@
+<% content_for :title, "How It Works — SpaceHub India" %>
+
+<div class="bg-dark text-white py-5 text-center">
+  <div class="container py-3">
+    <h1 class="display-5 fw-bold mb-3">How SpaceHub Works</h1>
+    <p class="lead text-secondary">Book unique spaces by the hour — simple, secure, instant.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5 align-items-center mb-5">
+    <div class="col-md-6">
+      <span class="badge bg-warning text-dark mb-2">For Guests</span>
+      <h2 class="fw-bold mb-4">Book in 3 Simple Steps</h2>
+      <div class="d-flex gap-3 mb-4">
+        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;min-width:40px;">1</div>
+        <div>
+          <h6 class="fw-semibold mb-1">Browse & Discover</h6>
+          <p class="text-muted mb-0">Filter by city, category, price, and capacity to find your perfect space.</p>
+        </div>
+      </div>
+      <div class="d-flex gap-3 mb-4">
+        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;min-width:40px;">2</div>
+        <div>
+          <h6 class="fw-semibold mb-1">Book & Pay Securely</h6>
+          <p class="text-muted mb-0">Choose your date and time slot. Pay instantly via Razorpay (UPI, cards) or Stripe.</p>
+        </div>
+      </div>
+      <div class="d-flex gap-3">
+        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;min-width:40px;">3</div>
+        <div>
+          <h6 class="fw-semibold mb-1">Enjoy Your Space</h6>
+          <p class="text-muted mb-0">Show up at your booked time. Leave a review to help the community.</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <%= link_to "Browse Spaces", listings_path, class: "btn btn-warning fw-semibold px-4" %>
+      </div>
+    </div>
+    <div class="col-md-6 text-center">
+      <div style="font-size:8rem;">🔍📅✨</div>
+    </div>
+  </div>
+
+  <hr class="my-5">
+
+  <div class="row g-5 align-items-center">
+    <div class="col-md-6 text-center order-md-1">
+      <div style="font-size:8rem;">🏛️💰🌟</div>
+    </div>
+    <div class="col-md-6 order-md-2">
+      <span class="badge bg-dark text-white mb-2">For Hosts</span>
+      <h2 class="fw-bold mb-4">Earn from Your Space</h2>
+      <div class="d-flex gap-3 mb-4">
+        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;min-width:40px;">1</div>
+        <div>
+          <h6 class="fw-semibold mb-1">List Your Space</h6>
+          <p class="text-muted mb-0">Create a listing with photos, pricing, and availability. AI helps write your description.</p>
+        </div>
+      </div>
+      <div class="d-flex gap-3 mb-4">
+        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;min-width:40px;">2</div>
+        <div>
+          <h6 class="fw-semibold mb-1">Accept Bookings</h6>
+          <p class="text-muted mb-0">Guests book and pay online. You manage everything from your host dashboard.</p>
+        </div>
+      </div>
+      <div class="d-flex gap-3">
+        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;min-width:40px;">3</div>
+        <div>
+          <h6 class="fw-semibold mb-1">Get Paid</h6>
+          <p class="text-muted mb-0">Keep 85% of every booking. Payouts processed within 2 business days.</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <%= link_to "Start Hosting", new_user_registration_path, class: "btn btn-dark fw-semibold px-4" %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+  <div class="container">
+    <%= link_to root_path, class: "navbar-brand fw-bold fs-4" do %>
+      <i class="bi bi-geo-alt-fill text-warning"></i> SpaceHub
+    <% end %>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <%= link_to "Browse Spaces", listings_path, class: "nav-link" %>
+        </li>
+        <li class="nav-item">
+          <%= link_to "How It Works", how_it_works_path, class: "nav-link" %>
+        </li>
+        <% if user_signed_in? && current_user.guest? %>
+          <li class="nav-item">
+            <%= link_to "Become a Host", become_host_page_path, class: "nav-link text-warning fw-semibold" %>
+          </li>
+        <% end %>
+      </ul>
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+        <% if user_signed_in? %>
+          <% if current_user.host? || current_user.admin? %>
+            <li class="nav-item">
+              <%= link_to "Host Dashboard", host_root_path, class: "nav-link" %>
+            </li>
+          <% end %>
+          <% if current_user.admin? %>
+            <li class="nav-item">
+              <%= link_to "Admin", admin_root_path, class: "nav-link text-warning" %>
+            </li>
+          <% end %>
+          <!-- Notification bell -->
+          <li class="nav-item me-1">
+            <% unread_count = current_user.notifications.unread.count %>
+            <div class="position-relative" data-controller="notification-bell">
+              <button class="btn btn-link nav-link px-2 py-0"
+                      data-action="click->notification-bell#toggle"
+                      title="Notifications">
+                <i class="bi bi-bell-fill" style="font-size:1.1rem;"></i>
+                <% if unread_count > 0 %>
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                        style="font-size:0.6rem;">
+                    <%= unread_count > 9 ? "9+" : unread_count %>
+                  </span>
+                <% end %>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end shadow p-0"
+                   style="width:320px; max-height:400px; overflow-y:auto;"
+                   data-notification-bell-target="dropdown">
+                <div class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                  <span class="fw-semibold small">Notifications</span>
+                  <%= link_to "View all", notifications_path, class: "small text-muted text-decoration-none" %>
+                </div>
+                <% recent_notifs = current_user.notifications.recent.limit(5) %>
+                <% if recent_notifs.any? %>
+                  <% recent_notifs.each do |notif| %>
+                    <%= link_to mark_read_notification_path(notif),
+                          data: { turbo_method: :patch },
+                          class: "dropdown-item px-3 py-2 border-bottom small #{'bg-warning bg-opacity-10' unless notif.read?}" do %>
+                      <p class="mb-0 <%= notif.read? ? 'text-muted' : 'fw-semibold' %>">
+                        <%= truncate(notif.message, length: 60) %>
+                      </p>
+                      <span class="text-muted" style="font-size:0.7rem;">
+                        <%= time_ago_in_words(notif.created_at) %> ago
+                      </span>
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <div class="text-center text-muted py-4 small">No notifications</div>
+                <% end %>
+              </div>
+            </div>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i> <%= current_user.display_name %>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <%= link_to "My Bookings", guest_bookings_path, class: "dropdown-item" %>
+              <%= link_to "Notifications", notifications_path, class: "dropdown-item" %>
+              <%= link_to "Edit Profile", edit_user_registration_path, class: "dropdown-item" %>
+              <% if current_user.host? %>
+                <li><hr class="dropdown-divider"></li>
+                <%= link_to "Host Dashboard", host_root_path, class: "dropdown-item" %>
+                <%= link_to "My Listings", host_listings_path, class: "dropdown-item" %>
+                <%= link_to "Bookings", host_bookings_path, class: "dropdown-item" %>
+                <%= link_to "Payments", host_payments_path, class: "dropdown-item" %>
+                <%= link_to "Payment Settings", host_gateway_configs_path, class: "dropdown-item" %>
+              <% end %>
+              <li><hr class="dropdown-divider"></li>
+              <%= link_to "Sign Out", destroy_user_session_path, data: { turbo_method: :delete }, class: "dropdown-item text-danger" %>
+            </ul>
+          </li>
+        <% else %>
+          <li class="nav-item">
+            <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
+          </li>
+          <li class="nav-item ms-2">
+            <%= link_to "Join Free", new_user_registration_path, class: "btn btn-warning btn-sm fw-semibold" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>

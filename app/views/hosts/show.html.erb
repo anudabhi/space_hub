@@ -1,0 +1,95 @@
+<% content_for :title, "#{@host.display_name} — SpaceHub Host" %>
+
+<div class="container py-4" style="max-width:960px;">
+
+  <!-- Host header -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+             style="width:80px;height:80px;font-size:2rem;">
+          <%= @host.display_name.first.upcase %>
+        </div>
+        <div class="flex-grow-1">
+          <h2 class="fw-bold mb-1"><%= @host.display_name %></h2>
+          <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
+            <% if @host.city.present? %>
+              <span class="text-muted small"><i class="bi bi-geo-alt me-1"></i><%= @host.city %></span>
+            <% end %>
+            <% if @avg_rating %>
+              <span class="text-warning fw-semibold small">
+                ★ <%= @avg_rating %>
+                <span class="text-muted fw-normal">(<%= @total_reviews %> reviews)</span>
+              </span>
+            <% end %>
+            <span class="text-muted small"><i class="bi bi-house me-1"></i><%= @listings.count %> listing<%= @listings.count == 1 ? "" : "s" %></span>
+          </div>
+          <% if @host.bio.present? %>
+            <p class="text-muted mb-0"><%= @host.bio %></p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div class="row g-3 mb-4">
+    <div class="col-4">
+      <div class="card border-0 bg-dark text-white text-center py-3">
+        <div class="h4 fw-bold mb-0"><%= @listings.count %></div>
+        <div class="text-secondary small">Listings</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card border-0 bg-warning text-dark text-center py-3">
+        <div class="h4 fw-bold mb-0"><%= @avg_rating || "—" %></div>
+        <div class="small">Avg Rating</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card border-0 bg-light text-center py-3">
+        <div class="h4 fw-bold mb-0"><%= @total_reviews %></div>
+        <div class="text-muted small">Reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listings -->
+  <h4 class="fw-semibold mb-3">Spaces by <%= @host.display_name %></h4>
+  <% if @listings.any? %>
+    <div class="row g-4 mb-4">
+      <% @listings.each do |listing| %>
+        <div class="col-md-6">
+          <%= render "listings/card", listing: listing %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted">No active listings at the moment.</p>
+  <% end %>
+
+  <!-- Reviews -->
+  <% if @reviews.any? %>
+    <h4 class="fw-semibold mb-3">Guest Reviews</h4>
+    <div class="row g-3">
+      <% @reviews.each do |review| %>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <span class="fw-semibold small"><%= review.user.display_name %></span>
+                  <span class="text-muted small ms-2"><%= review.listing.title.truncate(30) %></span>
+                </div>
+                <span class="text-warning small"><%= "★" * review.rating %><%= "☆" * (5 - review.rating) %></span>
+              </div>
+              <p class="text-muted small mb-1 fst-italic">"<%= truncate(review.body, length: 120) %>"</p>
+              <span class="text-muted" style="font-size:0.7rem;"><%= review.created_at.strftime("%b %Y") %></span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>

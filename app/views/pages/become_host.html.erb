@@ -1,0 +1,49 @@
+<% content_for :title, "Become a Host — SpaceHub" %>
+<% content_for :meta_description, "List your space on SpaceHub and earn by the hour." %>
+
+<div class="container py-5" style="max-width:720px;">
+  <div class="text-center mb-5">
+    <div class="display-4 mb-3">🏠</div>
+    <h1 class="fw-bold">Earn by hosting your space</h1>
+    <p class="lead text-muted">Turn your studio, spa, or venue into a revenue stream.<br>List in minutes, get paid instantly.</p>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-4 text-center">
+      <div class="fs-1 mb-2">📸</div>
+      <h5 class="fw-semibold">List your space</h5>
+      <p class="text-muted small">Add photos, set your price per hour, and describe what makes your space special.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <div class="fs-1 mb-2">📅</div>
+      <h5 class="fw-semibold">Set availability</h5>
+      <p class="text-muted small">Control your schedule. Block dates, set hours, and manage bookings from your dashboard.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <div class="fs-1 mb-2">💰</div>
+      <h5 class="fw-semibold">Get paid</h5>
+      <p class="text-muted small">Receive payments via Razorpay or Stripe directly to your account after each booking.</p>
+    </div>
+  </div>
+
+  <% if user_signed_in? %>
+    <% if current_user.guest? %>
+      <div class="text-center">
+        <%= button_to "Become a Host — It's Free", become_host_path,
+              method: :patch,
+              class: "btn btn-warning btn-lg fw-bold px-5",
+              data: { turbo_confirm: "Switch your account to a host? You can still book spaces as before." } %>
+        <p class="text-muted small mt-3">Your guest bookings and history are preserved.</p>
+      </div>
+    <% else %>
+      <div class="alert alert-info text-center">
+        You're already a <%= current_user.role %> — <a href="<%= host_root_path %>">go to Host Dashboard</a>.
+      </div>
+    <% end %>
+  <% else %>
+    <div class="text-center">
+      <%= link_to "Sign up & Start Hosting", new_user_registration_path, class: "btn btn-warning btn-lg fw-bold px-5" %>
+      <p class="text-muted small mt-3">Already have an account? <%= link_to "Sign in", new_user_session_path %>.</p>
+    </div>
+  <% end %>
+</div>

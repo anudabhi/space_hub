@@ -1,0 +1,129 @@
+<% content_for :title, "Payments — Host Dashboard" %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Payments</h2>
+    <%= link_to "← Dashboard", host_root_path, class: "btn btn-outline-secondary btn-sm" %>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 bg-dark text-white text-center py-3">
+        <div class="h4 fw-bold mb-0"><%= @payments.count %></div>
+        <div class="text-secondary small">Total Payments</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 bg-success text-white text-center py-3">
+        <div class="h4 fw-bold mb-0">₹<%= number_with_delimiter(@total.to_i) %></div>
+        <div class="small">Total Collected</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 bg-warning text-dark text-center py-3">
+        <div class="h4 fw-bold mb-0">₹<%= number_with_delimiter(@by_gateway["razorpay"].to_i) %></div>
+        <div class="small">via Razorpay</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 bg-primary text-white text-center py-3">
+        <div class="h4 fw-bold mb-0">₹<%= number_with_delimiter(@by_gateway["stripe"].to_i) %></div>
+        <div class="small">via Stripe</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <%= form_with url: host_payments_path, method: :get, class: "card border-0 shadow-sm mb-4" do |f| %>
+    <div class="card-body py-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-sm-3">
+          <%= label_tag :gateway, "Gateway", class: "form-label small mb-1" %>
+          <%= select_tag :gateway,
+                options_for_select([["All", ""], ["Razorpay", "razorpay"], ["Stripe", "stripe"]], params[:gateway]),
+                class: "form-select form-select-sm" %>
+        </div>
+        <div class="col-sm-3">
+          <%= label_tag :from, "From", class: "form-label small mb-1" %>
+          <%= date_field_tag :from, params[:from], class: "form-control form-control-sm" %>
+        </div>
+        <div class="col-sm-3">
+          <%= label_tag :to, "To", class: "form-label small mb-1" %>
+          <%= date_field_tag :to, params[:to], class: "form-control form-control-sm" %>
+        </div>
+        <div class="col-sm-3 d-flex gap-2 pt-3">
+          <%= f.submit "Apply", class: "btn btn-dark btn-sm px-4" %>
+          <% if params[:gateway].present? || params[:from].present? || params[:to].present? %>
+            <%= link_to "Clear", host_payments_path, class: "btn btn-outline-secondary btn-sm" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Table -->
+  <% if @payments.any? %>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Guest</th>
+            <th>Space</th>
+            <th>Date</th>
+            <th>Duration</th>
+            <th>Amount</th>
+            <th>Gateway</th>
+            <th>Payment ID</th>
+            <th>Booking Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @payments.each do |booking| %>
+            <tr data-controller="row-link"
+                data-href="<%= host_booking_path(booking) %>"
+                data-action="click->row-link#navigate"
+                style="cursor:pointer;">
+              <td class="text-muted small">#<%= booking.id %></td>
+              <td class="fw-semibold small"><%= booking.user.display_name %></td>
+              <td class="small text-muted"><%= booking.listing.title.truncate(28) %></td>
+              <td class="small"><%= booking.start_time.strftime("%d %b %Y") %></td>
+              <td class="small"><%= booking.hours_duration %> hr</td>
+              <td class="small fw-bold">₹<%= number_with_delimiter(booking.total_price.to_i) %></td>
+              <td class="small">
+                <% color = booking.payment_gateway == "razorpay" ? "warning text-dark" : "primary" %>
+                <span class="badge bg-<%= color %>"><%= booking.payment_gateway.capitalize %></span>
+              </td>
+              <td class="small text-muted font-monospace"><%= booking.payment_id %></td>
+              <td>
+                <% status_color = { "confirmed" => "success", "pending" => "warning text-dark",
+                                    "completed" => "secondary", "cancelled" => "danger" }[booking.status] || "secondary" %>
+                <span class="badge bg-<%= status_color %>"><%= booking.status.capitalize %></span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-muted small mt-2">
+      Showing <%= pluralize(@payments.count, "payment") %>
+      <% if params[:gateway].present? %>
+        · gateway: <strong><%= params[:gateway].capitalize %></strong>
+      <% end %>
+      <% if params[:from].present? %>
+        · from <strong><%= params[:from] %></strong>
+      <% end %>
+      <% if params[:to].present? %>
+        · to <strong><%= params[:to] %></strong>
+      <% end %>
+    </p>
+  <% else %>
+    <div class="text-center py-5 text-muted">
+      <div class="display-4 mb-3">💳</div>
+      <p>No payments found for the selected filters.</p>
+      <%= link_to "Clear filters", host_payments_path, class: "btn btn-outline-secondary btn-sm" %>
+    </div>
+  <% end %>
+</div>

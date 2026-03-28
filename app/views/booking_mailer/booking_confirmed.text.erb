@@ -1,0 +1,11 @@
+Booking Confirmed!
+
+Hi <%= @guest.display_name %>,
+
+Your booking at "<%= @listing.title %>" is confirmed.
+
+Date: <%= @booking.start_time.strftime("%d %b %Y") %>
+Time: <%= @booking.start_time.strftime("%I:%M %p") %> - <%= @booking.end_time.strftime("%I:%M %p") %>
+Address: <%= @listing.address %>, <%= @listing.city %>
+
+<%= guest_booking_url(@booking) %>

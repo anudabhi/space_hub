@@ -1,0 +1,13 @@
+Booking Request Received
+
+Hi <%= @guest.display_name %>,
+
+Your booking request for "<%= @listing.title %>" has been received.
+
+Date: <%= @booking.start_time.strftime("%d %b %Y") %>
+Time: <%= @booking.start_time.strftime("%I:%M %p") %> - <%= @booking.end_time.strftime("%I:%M %p") %>
+Duration: <%= @booking.hours_duration %> hours
+Total: Rs. <%= @booking.total_price.to_i %>
+
+Please complete your payment to confirm the booking:
+<%= guest_booking_url(@booking) %>

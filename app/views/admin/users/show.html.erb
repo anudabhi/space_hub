@@ -1,0 +1,39 @@
+<% content_for :title, "#{@user.display_name} — Admin" %>
+
+<div class="container py-4" style="max-width:640px;">
+  <div class="mb-3">
+    <%= link_to "← Users", admin_users_path, class: "btn btn-outline-secondary btn-sm" %>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h4 class="fw-bold mb-0"><%= @user.display_name %></h4>
+        <span class="badge bg-<%= @user.role == 'admin' ? 'danger' : @user.role == 'host' ? 'warning text-dark' : 'secondary' %>">
+          <%= @user.role %>
+        </span>
+      </div>
+      <dl class="row mb-0">
+        <dt class="col-sm-4 text-muted fw-normal">Email</dt>
+        <dd class="col-sm-8"><%= @user.email %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Phone</dt>
+        <dd class="col-sm-8"><%= @user.phone.presence || "—" %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">City</dt>
+        <dd class="col-sm-8"><%= @user.city.presence || "—" %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Bio</dt>
+        <dd class="col-sm-8"><%= @user.bio.presence || "—" %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Joined</dt>
+        <dd class="col-sm-8"><%= @user.created_at.strftime("%d %b %Y") %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Listings</dt>
+        <dd class="col-sm-8"><%= @user.listings.count %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Bookings</dt>
+        <dd class="col-sm-8"><%= @user.bookings.count %></dd>
+      </dl>
+    </div>
+  </div>
+
+  <%= link_to "Edit", edit_admin_user_path(@user), class: "btn btn-warning fw-semibold me-2" %>
+  <%= link_to "Delete", admin_user_path(@user),
+        data: { turbo_method: :delete, turbo_confirm: "Delete this user?" },
+        class: "btn btn-outline-danger" %>
+</div>

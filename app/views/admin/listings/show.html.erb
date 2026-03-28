@@ -1,0 +1,46 @@
+<% content_for :title, "#{@listing.title} — Admin" %>
+
+<div class="container py-4" style="max-width:700px;">
+  <div class="mb-3 d-flex gap-2">
+    <%= link_to "← Listings", admin_listings_path, class: "btn btn-outline-secondary btn-sm" %>
+    <%= link_to "Edit", edit_admin_listing_path(@listing), class: "btn btn-outline-secondary btn-sm" %>
+    <% if @listing.status != "active" %>
+      <%= link_to "Approve", approve_admin_listing_path(@listing),
+            data: { turbo_method: :patch },
+            class: "btn btn-success btn-sm" %>
+    <% end %>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h4 class="fw-bold mb-0"><%= @listing.title %></h4>
+        <span class="badge bg-<%= @listing.status == 'active' ? 'success' : 'secondary' %>">
+          <%= @listing.status %>
+        </span>
+      </div>
+      <dl class="row mb-0">
+        <dt class="col-sm-4 text-muted fw-normal">Host</dt>
+        <dd class="col-sm-8"><%= link_to @listing.user.display_name, admin_user_path(@listing.user) %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Category</dt>
+        <dd class="col-sm-8 text-capitalize"><%= @listing.category %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">City</dt>
+        <dd class="col-sm-8"><%= @listing.city %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Address</dt>
+        <dd class="col-sm-8"><%= @listing.address.presence || "—" %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Price/hr</dt>
+        <dd class="col-sm-8">₹<%= number_with_delimiter(@listing.price_per_hour.to_i) %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Capacity</dt>
+        <dd class="col-sm-8"><%= @listing.capacity %> people</dd>
+        <dt class="col-sm-4 text-muted fw-normal">Rating</dt>
+        <dd class="col-sm-8"><%= @listing.avg_rating.to_f > 0 ? "★ #{@listing.avg_rating} (#{@listing.reviews_count})" : "No reviews" %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Bookings</dt>
+        <dd class="col-sm-8"><%= @listing.bookings.count %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Description</dt>
+        <dd class="col-sm-8 small"><%= @listing.description.to_s.truncate(200) %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Amenities</dt>
+        <dd class="col-sm-8 small"><%= @listing.amenities.presence || "—" %></dd>
+      </dl>
+    </div>
+  </div>
+</div>

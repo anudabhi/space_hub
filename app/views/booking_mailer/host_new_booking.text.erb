@@ -1,0 +1,12 @@
+New Booking Request
+
+Hi <%= @host.display_name %>,
+
+<%= @guest.display_name %> has requested to book "<%= @listing.title %>".
+
+Date: <%= @booking.start_time.strftime("%d %b %Y") %>
+Time: <%= @booking.start_time.strftime("%I:%M %p") %> - <%= @booking.end_time.strftime("%I:%M %p") %>
+Duration: <%= @booking.hours_duration %> hours
+Total: Rs. <%= @booking.total_price.to_i %>
+
+Review and confirm: <%= confirm_host_booking_url(@booking) %>

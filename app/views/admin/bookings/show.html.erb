@@ -1,0 +1,60 @@
+<% content_for :title, "Booking ##{@booking.id} — Admin" %>
+
+<div class="container py-4" style="max-width:640px;">
+  <div class="mb-3">
+    <%= link_to "← Bookings", admin_bookings_path, class: "btn btn-outline-secondary btn-sm" %>
+  </div>
+
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <h2 class="fw-bold mb-0">Booking #<%= @booking.id %></h2>
+    <span class="badge bg-<%= @booking.status == 'confirmed' ? 'success' : @booking.status == 'pending' ? 'warning text-dark' : @booking.status == 'cancelled' ? 'danger' : 'secondary' %>">
+      <%= @booking.status.capitalize %>
+    </span>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body p-4">
+      <h6 class="fw-semibold mb-3">Booking Details</h6>
+      <dl class="row mb-0">
+        <dt class="col-sm-4 text-muted fw-normal">Space</dt>
+        <dd class="col-sm-8"><%= link_to @booking.listing.title, admin_listing_path(@booking.listing) %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Guest</dt>
+        <dd class="col-sm-8"><%= link_to @booking.user.display_name, admin_user_path(@booking.user) %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Start</dt>
+        <dd class="col-sm-8"><%= @booking.start_time.strftime("%d %b %Y, %I:%M %p") %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">End</dt>
+        <dd class="col-sm-8"><%= @booking.end_time.strftime("%d %b %Y, %I:%M %p") %></dd>
+        <dt class="col-sm-4 text-muted fw-normal">Duration</dt>
+        <dd class="col-sm-8"><%= @booking.hours_duration %> hours</dd>
+        <dt class="col-sm-4 text-muted fw-normal">Total</dt>
+        <dd class="col-sm-8 fw-bold">₹<%= number_with_delimiter(@booking.total_price.to_i) %></dd>
+      </dl>
+    </div>
+  </div>
+
+  <% if @booking.payment.present? %>
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-3">Payment</h6>
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted fw-normal">Gateway</dt>
+          <dd class="col-sm-8 text-capitalize"><%= @booking.payment.gateway %></dd>
+          <dt class="col-sm-4 text-muted fw-normal">Payment ID</dt>
+          <dd class="col-sm-8 small font-monospace"><%= @booking.payment.payment_id %></dd>
+          <dt class="col-sm-4 text-muted fw-normal">Status</dt>
+          <dd class="col-sm-8"><span class="badge bg-<%= @booking.payment.captured? ? 'success' : 'danger' %>"><%= @booking.payment.status %></span></dd>
+        </dl>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @booking.review.present? %>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-2">Review</h6>
+        <div class="text-warning mb-1">#{"★" * @booking.review.rating}#{"☆" * (5 - @booking.review.rating)}</div>
+        <p class="mb-0 small"><%= @booking.review.body %></p>
+      </div>
+    </div>
+  <% end %>
+</div>

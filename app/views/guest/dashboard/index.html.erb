@@ -1,0 +1,53 @@
+<% content_for :title, "My Dashboard — SpaceHub" %>
+
+<div class="container py-4">
+  <h2 class="fw-bold mb-4">Welcome, <%= current_user.display_name %> 👋</h2>
+
+  <div class="row g-4">
+    <div class="col-md-8">
+      <h5 class="fw-semibold mb-3">Upcoming Bookings</h5>
+      <% if @upcoming_bookings.any? %>
+        <% @upcoming_bookings.each do |booking| %>
+          <%= render "guest/bookings/booking_card", booking: booking %>
+        <% end %>
+      <% else %>
+        <div class="card border-0 bg-light text-center py-5">
+          <p class="text-muted mb-3">No upcoming bookings.</p>
+          <%= link_to "Browse Spaces", listings_path, class: "btn btn-warning fw-semibold" %>
+        </div>
+      <% end %>
+
+      <% if @past_bookings.any? %>
+        <h5 class="fw-semibold mt-4 mb-3">Recent Bookings</h5>
+        <% @past_bookings.each do |booking| %>
+          <%= render "guest/bookings/booking_card", booking: booking %>
+        <% end %>
+        <div class="text-end">
+          <%= link_to "View all bookings →", guest_bookings_path, class: "text-decoration-none small" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 bg-dark text-white">
+        <div class="card-body p-4 text-center">
+          <div class="display-4 mb-2">🏙️</div>
+          <h6 class="fw-semibold mb-1"><%= current_user.city.presence || "India" %></h6>
+          <p class="text-secondary small mb-3">Your city</p>
+          <%= link_to "Browse spaces near you", listings_path(city: current_user.city), class: "btn btn-warning btn-sm fw-semibold" %>
+        </div>
+      </div>
+
+      <div class="card border-0 bg-light mt-3">
+        <div class="card-body p-3">
+          <h6 class="fw-semibold mb-3">Quick Links</h6>
+          <ul class="list-unstyled mb-0 small">
+            <li class="mb-2"><%= link_to "✦ My Bookings", guest_bookings_path, class: "text-decoration-none" %></li>
+            <li class="mb-2"><%= link_to "✦ Browse Spaces", listings_path, class: "text-decoration-none" %></li>
+            <li><%= link_to "✦ Edit Profile", edit_user_registration_path, class: "text-decoration-none" %></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

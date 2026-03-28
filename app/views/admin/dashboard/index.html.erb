@@ -1,0 +1,90 @@
+<% content_for :title, "Admin Dashboard — SpaceHub" %>
+
+<div class="container py-4">
+  <h2 class="fw-bold mb-4">Admin Dashboard</h2>
+
+  <div class="row g-3 mb-5">
+    <div class="col-md-3">
+      <div class="card border-0 bg-dark text-white text-center py-3">
+        <div class="h2 fw-bold mb-0"><%= @users_count %></div>
+        <div class="text-secondary small">Users</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 bg-primary text-white text-center py-3">
+        <div class="h2 fw-bold mb-0"><%= @listings_count %></div>
+        <div class="text-white-50 small">Listings</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 bg-warning text-dark text-center py-3">
+        <div class="h2 fw-bold mb-0"><%= @bookings_count %></div>
+        <div class="small">Bookings</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 bg-success text-white text-center py-3">
+        <div class="h2 fw-bold mb-0">₹<%= number_with_delimiter(@revenue.to_i) %></div>
+        <div class="small">Revenue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-semibold mb-0">Recent Users</h5>
+        <%= link_to "View all", admin_users_path, class: "small text-decoration-none" %>
+      </div>
+      <% @recent_users.each do |user| %>
+        <div class="d-flex align-items-center gap-2 mb-2 py-2 border-bottom">
+          <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:36px;height:36px;font-size:0.8rem;">
+            <%= user.display_name.first.upcase %>
+          </div>
+          <div>
+            <p class="mb-0 small fw-semibold"><%= user.display_name %></p>
+            <p class="mb-0 text-muted" style="font-size:0.75rem;"><%= user.role %> · <%= user.created_at.strftime("%d %b") %></p>
+          </div>
+          <span class="ms-auto badge bg-<%= user.role == 'admin' ? 'danger' : user.role == 'host' ? 'warning text-dark' : 'secondary' %>">
+            <%= user.role %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-semibold mb-0">Recent Bookings</h5>
+        <%= link_to "View all", admin_bookings_path, class: "small text-decoration-none" %>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead class="table-light">
+            <tr><th>Guest</th><th>Space</th><th>Date</th><th>Amount</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <% @recent_bookings.each do |booking| %>
+              <tr>
+                <td class="small"><%= booking.user.display_name %></td>
+                <td class="small"><%= booking.listing.title.truncate(25) %></td>
+                <td class="small text-muted"><%= booking.start_time.strftime("%d %b") %></td>
+                <td class="small fw-bold">₹<%= number_with_delimiter(booking.total_price.to_i) %></td>
+                <td>
+                  <span class="badge bg-<%= booking.status == 'confirmed' ? 'success' : booking.status == 'pending' ? 'warning text-dark' : booking.status == 'cancelled' ? 'danger' : 'secondary' %>">
+                    <%= booking.status.capitalize %>
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 d-flex gap-2 flex-wrap">
+        <%= link_to "Manage Users", admin_users_path, class: "btn btn-outline-dark btn-sm" %>
+        <%= link_to "Manage Listings", admin_listings_path, class: "btn btn-outline-dark btn-sm" %>
+        <%= link_to "Manage Bookings", admin_bookings_path, class: "btn btn-outline-dark btn-sm" %>
+      </div>
+    </div>
+  </div>
+</div>

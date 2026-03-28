@@ -1,0 +1,44 @@
+<% content_for :title, "My Listings — SpaceHub" %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">My Listings</h2>
+    <%= link_to "+ New Listing", new_host_listing_path, class: "btn btn-warning fw-semibold" %>
+  </div>
+
+  <% if @listings.any? %>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Title</th><th>Category</th><th>City</th><th>Price/hr</th><th>Status</th><th>Rating</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @listings.each do |listing| %>
+            <tr>
+              <td><%= link_to listing.title, host_listing_path(listing), class: "fw-bold text-decoration-none" %></td>
+              <td><span class="badge bg-secondary text-capitalize"><%= listing.category %></span></td>
+              <td><%= listing.city %></td>
+              <td>₹<%= number_with_delimiter(listing.price_per_hour.to_i) %></td>
+              <td><span class="badge bg-<%= listing.status == 'active' ? 'success' : 'secondary' %>"><%= listing.status %></span></td>
+              <td><%= listing.avg_rating.to_f > 0 ? "★ #{listing.avg_rating}" : "—" %></td>
+              <td class="text-end">
+                <%= link_to "View", host_listing_path(listing), class: "btn btn-outline-secondary btn-sm me-1" %>
+                <%= link_to "Edit", edit_host_listing_path(listing), class: "btn btn-outline-secondary btn-sm me-1" %>
+                <%= link_to "Slots", host_listing_availabilities_path(listing), class: "btn btn-outline-secondary btn-sm me-1" %>
+                <%= link_to "Delete", host_listing_path(listing), data: { turbo_method: :delete, turbo_confirm: "Delete this listing?" }, class: "btn btn-outline-danger btn-sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="text-center py-5 text-muted">
+      <div class="display-4 mb-3">🏛️</div>
+      <p>You haven't created any listings yet.</p>
+      <%= link_to "Create your first listing", new_host_listing_path, class: "btn btn-warning" %>
+    </div>
+  <% end %>
+</div>
