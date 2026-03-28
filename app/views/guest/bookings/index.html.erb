@@ -1,0 +1,42 @@
+<% content_for :title, "My Bookings — SpaceHub" %>
+
+<div class="container py-4">
+  <h2 class="fw-bold mb-4">My Bookings</h2>
+
+  <ul class="nav nav-tabs mb-4" id="bookingTabs">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#upcoming">
+        Upcoming <span class="badge bg-warning text-dark ms-1"><%= @upcoming.count %></span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#past">Past</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#cancelled">Cancelled</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="upcoming">
+      <% if @upcoming.any? %>
+        <% @upcoming.each do |booking| %>
+          <%= render "booking_card", booking: booking %>
+        <% end %>
+      <% else %>
+        <div class="text-center py-5 text-muted">
+          <div class="display-4 mb-3">📅</div>
+          <p>No upcoming bookings. <%= link_to "Browse spaces", listings_path %></p>
+        </div>
+      <% end %>
+    </div>
+    <div class="tab-pane fade" id="past">
+      <% @past.each { |b| render "booking_card", booking: b } %>
+      <% if @past.empty? %><p class="text-muted py-3">No past bookings yet.</p><% end %>
+    </div>
+    <div class="tab-pane fade" id="cancelled">
+      <% @cancelled.each { |b| render "booking_card", booking: b } %>
+      <% if @cancelled.empty? %><p class="text-muted py-3">No cancelled bookings.</p><% end %>
+    </div>
+  </div>
+</div>

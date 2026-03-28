@@ -1,0 +1,70 @@
+<% content_for :title, "Book #{@listing.title} — SpaceHub" %>
+
+<div class="container py-4" style="max-width: 640px;">
+  <h1 class="h3 mb-4">Book <em><%= @listing.title %></em></h1>
+
+  <%= form_with model: [@listing, @booking], url: listing_bookings_path(@listing),
+        data: { controller: "booking-preview",
+                "booking-preview-price-per-hour-value": @listing.price_per_hour } do |f| %>
+
+    <% if @booking.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% @booking.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-3">
+      <%= f.label :start_time, "Start Time", class: "form-label" %>
+      <%= f.datetime_local_field :start_time, class: "form-control",
+            value: @booking.start_time&.strftime("%Y-%m-%dT%H:%M"),
+            data: { "booking-preview-target": "startTime", action: "change->booking-preview#update" } %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :end_time, "End Time", class: "form-label" %>
+      <%= f.datetime_local_field :end_time, class: "form-control",
+            value: @booking.end_time&.strftime("%Y-%m-%dT%H:%M"),
+            data: { "booking-preview-target": "endTime", action: "change->booking-preview#update" } %>
+    </div>
+
+    <!-- Live price preview -->
+    <div data-booking-preview-target="preview" class="card border-success bg-success bg-opacity-10 mb-4 d-none">
+      <div class="card-body py-3 d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small">Duration: </span>
+          <strong data-booking-preview-target="hours"></strong> hrs
+          <span class="ms-2 text-muted small">@ ₹<%= number_with_delimiter(@listing.price_per_hour) %>/hr</span>
+        </div>
+        <div class="fs-5 fw-bold text-success" data-booking-preview-target="total"></div>
+      </div>
+    </div>
+
+    <% if @available_gateways.any? %>
+      <div class="mb-3">
+        <%= f.label :payment_gateway, "Payment Method", class: "form-label" %>
+        <% gateway_options = @available_gateways.map do |g|
+             g == "razorpay" ? ["Razorpay (UPI / Cards)", "razorpay"] : ["Stripe (International)", "stripe"]
+           end %>
+        <%= f.select :payment_gateway,
+              gateway_options,
+              { include_blank: gateway_options.size > 1 ? "Select payment method" : false },
+              class: "form-select" %>
+      </div>
+    <% else %>
+      <div class="alert alert-info py-2 small mb-3">
+        <i class="bi bi-info-circle me-1"></i>
+        Payment is handled offline. The host will confirm your booking manually.
+      </div>
+    <% end %>
+
+    <div class="d-flex gap-2">
+      <%= f.submit @available_gateways.any? ? "Confirm Booking" : "Request Booking",
+            class: "btn btn-primary" %>
+      <%= link_to "Back", listing_path(@listing), class: "btn btn-outline-secondary" %>
+    </div>
+  <% end %>
+</div>

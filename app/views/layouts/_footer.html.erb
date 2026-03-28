@@ -1,0 +1,40 @@
+<footer class="bg-dark text-light py-5 mt-auto">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-warning"></i> SpaceHub India</h5>
+        <p class="text-secondary small">Book unique spaces by the hour — private spas, creative studios, and event venues across India.</p>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6 class="fw-semibold mb-3">Explore</h6>
+        <ul class="list-unstyled small">
+          <li><%= link_to "Browse Spaces", listings_path, class: "text-secondary text-decoration-none" %></li>
+          <li><%= link_to "How It Works", how_it_works_path, class: "text-secondary text-decoration-none" %></li>
+          <li><%= link_to "About", about_path, class: "text-secondary text-decoration-none" %></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6 class="fw-semibold mb-3">Hosting</h6>
+        <ul class="list-unstyled small">
+          <% if user_signed_in? && (current_user.host? || current_user.admin?) %>
+            <li><%= link_to "Host Dashboard", host_root_path, class: "text-secondary text-decoration-none" %></li>
+          <% else %>
+            <li><%= link_to "Become a Host", new_user_registration_path, class: "text-secondary text-decoration-none" %></li>
+          <% end %>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6 class="fw-semibold mb-3">Legal</h6>
+        <ul class="list-unstyled small">
+          <li><%= link_to "Privacy Policy", privacy_path, class: "text-secondary text-decoration-none" %></li>
+          <li><%= link_to "Terms of Service", terms_path, class: "text-secondary text-decoration-none" %></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="border-secondary mt-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center small text-secondary">
+      <span>&copy; <%= Time.current.year %> SpaceHub India. All rights reserved.</span>
+      <span>Built with Rails 8 &middot; AI-powered &middot; Made for India</span>
+    </div>
+  </div>
+</footer>

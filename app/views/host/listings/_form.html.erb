@@ -1,0 +1,130 @@
+<%= form_with model: [:host, listing], class: "needs-validation",
+      data: { controller: "price-suggestion" } do |f| %>
+  <%= render "shared/errors", resource: listing %>
+
+  <div class="mb-3">
+    <%= f.label :title, class: "form-label fw-semibold" %>
+    <%= f.text_field :title, class: "form-control", placeholder: "e.g. Serene Rooftop Studio, Mumbai" %>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <%= f.label :category, class: "form-label fw-semibold" %>
+      <%= f.select :category, Listing::CATEGORIES.map { |c| [c.capitalize, c] }, { include_blank: "Select category" },
+            class: "form-select", data: { "price-suggestion-target": "category" } %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :city, class: "form-label fw-semibold" %>
+      <%= f.select :city, Listing::CITIES, { include_blank: "Select city" },
+            class: "form-select", data: { "price-suggestion-target": "city" } %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :address, class: "form-label fw-semibold" %>
+    <%= f.text_field :address, class: "form-control", placeholder: "Street address / landmark" %>
+  </div>
+
+  <div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+      <%= f.label :description, class: "form-label fw-semibold mb-0" %>
+      <button type="button" id="ai-generate-btn" class="btn btn-outline-secondary btn-sm">
+        ✨ AI Generate
+      </button>
+    </div>
+    <%= f.text_area :description, rows: 5, class: "form-control", id: "listing-description", placeholder: "Describe your space..." %>
+    <div id="ai-loading" class="text-muted small mt-1 d-none">Generating with Claude AI...</div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <%= f.label :price_per_hour, "Price per hour (₹)", class: "form-label fw-semibold mb-0" %>
+        <button type="button" class="btn btn-outline-secondary btn-sm"
+                data-price-suggestion-target="button"
+                data-action="click->price-suggestion#suggest">
+          ✨ Suggest Price
+        </button>
+      </div>
+      <%= f.number_field :price_per_hour, class: "form-control", placeholder: "e.g. 1500", min: 100,
+            data: { "price-suggestion-target": "price" } %>
+      <div class="d-none" data-price-suggestion-target="result"></div>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :capacity, "Max Capacity (people)", class: "form-label fw-semibold" %>
+      <%= f.number_field :capacity, class: "form-control", placeholder: "e.g. 10", min: 1,
+            data: { "price-suggestion-target": "capacity" } %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :amenities, "Amenities (comma-separated)", class: "form-label fw-semibold" %>
+    <%= f.text_field :amenities, class: "form-control", placeholder: "WiFi, AC, Parking, Sound system...",
+          data: { "price-suggestion-target": "amenities" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :photos, "Photos", class: "form-label fw-semibold" %>
+    <%= f.file_field :photos, multiple: true, accept: "image/*", class: "form-control", direct_upload: true %>
+    <div class="form-text">Upload up to 10 photos. First photo will be the cover.</div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Accepted Payment Gateways</label>
+    <div class="d-flex gap-4">
+      <% [["Razorpay (UPI / Cards)", "razorpay"], ["Stripe (International)", "stripe"]].each do |label, value| %>
+        <div class="form-check">
+          <%= check_box_tag "listing[accepted_gateways][]", value,
+                listing.accepted_gateways_list.include?(value),
+                id: "gateway_#{value}", class: "form-check-input" %>
+          <%= label_tag "gateway_#{value}", label, class: "form-check-label" %>
+        </div>
+      <% end %>
+    </div>
+    <div class="form-text">Guests will only see the gateways you enable.</div>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :status, class: "form-label fw-semibold" %>
+    <%= f.select :status, Listing::STATUSES.map { |s| [s.capitalize, s] }, {}, class: "form-select" %>
+  </div>
+
+  <div class="d-flex gap-3">
+    <%= f.submit listing.new_record? ? "Create Listing" : "Update Listing", class: "btn btn-warning fw-semibold px-4" %>
+    <%= link_to "Cancel", host_listings_path, class: "btn btn-outline-secondary px-4" %>
+  </div>
+<% end %>
+
+<% content_for :scripts do %>
+<script>
+document.getElementById("ai-generate-btn").addEventListener("click", function() {
+  const title = document.querySelector('[name="listing[title]"]').value;
+  const category = document.querySelector('[name="listing[category]"]').value;
+  const city = document.querySelector('[name="listing[city]"]').value;
+  const amenities = document.querySelector('[name="listing[amenities]"]').value;
+  const loading = document.getElementById("ai-loading");
+  const textarea = document.getElementById("listing-description");
+
+  if (!title) { alert("Please enter a title first."); return; }
+
+  loading.classList.remove("d-none");
+  this.disabled = true;
+
+  fetch("/ai/generate_description", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content },
+    body: JSON.stringify({ title, category, city, amenities })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.description) {
+      textarea.value = data.description;
+    } else {
+      alert(data.error || "Failed to generate description.");
+    }
+  })
+  .catch(() => alert("Network error. Please try again."))
+  .finally(() => { loading.classList.add("d-none"); this.disabled = false; });
+});
+</script>
+<% end %>

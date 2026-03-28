@@ -1,0 +1,144 @@
+<% content_for :title, "SpaceHub India — Book Unique Spaces by the Hour" %>
+
+<!-- Hero -->
+<section class="bg-dark text-white py-5" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;">
+  <div class="container py-4">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill">✨ AI-Powered Discovery</span>
+        <h1 class="display-4 fw-bold mb-4 lh-sm">
+          Book Unique Spaces<br>
+          <span class="text-warning">by the Hour</span>
+        </h1>
+        <p class="lead text-secondary mb-4">
+          Private spas, creative studios, and event venues across India's top cities.
+          From ₹500/hr.
+        </p>
+
+        <!-- Search bar -->
+        <%= form_with url: listings_path, method: :get, class: "d-flex gap-2 flex-wrap" do |f| %>
+          <%= f.select :city,
+                options_for_select([["All Cities", ""]] + Listing::CITIES.map { |c| [c, c] }),
+                {},
+                class: "form-select form-select-lg", style: "max-width: 160px;" %>
+          <%= f.select :category,
+                options_for_select([["All Types", ""]] + Listing::CATEGORIES.map { |c| [c.capitalize, c] }),
+                {},
+                class: "form-select form-select-lg", style: "max-width: 160px;" %>
+          <%= f.submit "Search", class: "btn btn-warning btn-lg px-4 fw-semibold" %>
+        <% end %>
+      </div>
+      <div class="col-lg-5 text-center d-none d-lg-block">
+        <div class="display-1">🏛️</div>
+        <div class="d-flex justify-content-center gap-3 mt-3">
+          <div class="badge bg-light bg-opacity-10 text-white px-3 py-2">🧘 Wellness</div>
+          <div class="badge bg-light bg-opacity-10 text-white px-3 py-2">🎨 Creative</div>
+          <div class="badge bg-light bg-opacity-10 text-white px-3 py-2">🎉 Events</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Category pills -->
+<section class="py-4 bg-light border-bottom">
+  <div class="container">
+    <div class="d-flex gap-3 flex-wrap justify-content-center">
+      <%= link_to listings_path(category: "wellness"), class: "btn btn-outline-secondary rounded-pill px-4" do %>
+        🧘 Wellness & Spas
+      <% end %>
+      <%= link_to listings_path(category: "creative"), class: "btn btn-outline-secondary rounded-pill px-4" do %>
+        🎨 Creative Studios
+      <% end %>
+      <%= link_to listings_path(category: "events"), class: "btn btn-outline-secondary rounded-pill px-4" do %>
+        🎉 Event Venues
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Listings -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold mb-0">Featured Spaces</h2>
+      <%= link_to "View all →", listings_path, class: "text-decoration-none" %>
+    </div>
+
+    <% if @featured_listings.any? %>
+      <div class="row g-4">
+        <% @featured_listings.each do |listing| %>
+          <div class="col-md-6 col-lg-4">
+            <%= render "listings/card", listing: listing %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-5 text-muted">
+        <div class="display-4 mb-3">🏛️</div>
+        <p>No spaces listed yet. <strong>Be the first host!</strong></p>
+        <%= link_to "List Your Space", new_user_registration_path, class: "btn btn-warning" %>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="py-5 bg-light">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-5">How SpaceHub Works</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="display-4 mb-3">🔍</div>
+        <h5 class="fw-semibold">1. Browse</h5>
+        <p class="text-muted">Filter by city, category, and price to find your perfect space.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="display-4 mb-3">📅</div>
+        <h5 class="fw-semibold">2. Book</h5>
+        <p class="text-muted">Pick your date and time slot. Pay securely via Razorpay or Stripe.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="display-4 mb-3">✨</div>
+        <h5 class="fw-semibold">3. Enjoy</h5>
+        <p class="text-muted">Show up, unlock your space, and create something amazing.</p>
+      </div>
+    </div>
+    <div class="mt-4">
+      <%= link_to "Learn More", how_it_works_path, class: "btn btn-outline-dark px-4 me-3" %>
+      <%= link_to "Browse Spaces", listings_path, class: "btn btn-dark px-4" %>
+    </div>
+  </div>
+</section>
+
+<!-- Cities -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="fw-bold text-center mb-5">Available in 6 Cities</h2>
+    <div class="row g-3 justify-content-center">
+      <% Listing::CITIES.each do |city| %>
+        <div class="col-6 col-md-4 col-lg-2">
+          <%= link_to listings_path(city: city), class: "text-decoration-none" do %>
+            <div class="card text-center h-100 border-0 shadow-sm hover-shadow">
+              <div class="card-body py-3">
+                <div class="fs-2 mb-1">🏙️</div>
+                <div class="fw-semibold small"><%= city %></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<% unless user_signed_in? %>
+  <section class="py-5 bg-warning">
+    <div class="container text-center">
+      <h2 class="fw-bold mb-3">Own a Unique Space?</h2>
+      <p class="lead mb-4">Join 100+ hosts already earning on SpaceHub. Set your own hours, keep 85% of every booking.</p>
+      <%= link_to "Start Hosting", new_user_registration_path, class: "btn btn-dark btn-lg px-5 fw-semibold" %>
+    </div>
+  </section>
+<% end %>

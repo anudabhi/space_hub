@@ -1,0 +1,186 @@
+<% content_for :title, "#{@listing.title} — Host" %>
+
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <%= link_to "← All Listings", host_listings_path, class: "text-decoration-none text-muted small" %>
+      <h2 class="fw-bold mb-1 mt-1"><%= @listing.title %></h2>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge bg-secondary text-capitalize"><%= @listing.category %></span>
+        <span class="badge bg-<%= @listing.status == 'active' ? 'success' : 'secondary' %>"><%= @listing.status.capitalize %></span>
+        <span class="text-muted small"><i class="bi bi-geo-alt me-1"></i><%= @listing.city %></span>
+        <% if @listing.avg_rating.present? %>
+          <span class="star-rating small">★</span>
+          <span class="small fw-semibold"><%= @listing.avg_rating %></span>
+          <span class="text-muted small">(<%= @listing.reviews_count %> reviews)</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <%= link_to "Edit", edit_host_listing_path(@listing), class: "btn btn-outline-secondary btn-sm" %>
+      <%= link_to "Manage Slots", host_listing_availabilities_path(@listing), class: "btn btn-outline-primary btn-sm" %>
+      <%= link_to "View Public Page", listing_path(@listing), class: "btn btn-outline-dark btn-sm", target: "_blank" %>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left column -->
+    <div class="col-lg-8">
+
+      <!-- Photos -->
+      <% if @listing.photos.attached? %>
+        <div class="d-flex gap-2 mb-4 overflow-auto">
+          <% @listing.photos.each do |photo| %>
+            <img src="<%= url_for(photo) %>" class="rounded" style="height:180px; width:240px; object-fit:cover; flex-shrink:0;">
+          <% end %>
+        </div>
+      <% end %>
+
+      <!-- Details -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-semibold mb-3">Listing Details</h6>
+          <dl class="row mb-0">
+            <dt class="col-sm-4 text-muted fw-normal">Price</dt>
+            <dd class="col-sm-8 fw-bold">₹<%= number_with_delimiter(@listing.price_per_hour.to_i) %> / hr</dd>
+
+            <dt class="col-sm-4 text-muted fw-normal">Capacity</dt>
+            <dd class="col-sm-8"><%= @listing.capacity %> people</dd>
+
+            <dt class="col-sm-4 text-muted fw-normal">Address</dt>
+            <dd class="col-sm-8"><%= @listing.address %></dd>
+
+            <% if @listing.amenities.present? %>
+              <dt class="col-sm-4 text-muted fw-normal">Amenities</dt>
+              <dd class="col-sm-8"><%= @listing.amenities %></dd>
+            <% end %>
+
+            <dt class="col-sm-4 text-muted fw-normal">Payment</dt>
+            <dd class="col-sm-8">
+              <% if @listing.accepted_gateways_list.any? %>
+                <%= @listing.accepted_gateways_list.map(&:capitalize).join(", ") %>
+              <% else %>
+                <span class="text-muted">Manual confirmation</span>
+              <% end %>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-semibold mb-2">Description</h6>
+          <p class="text-muted mb-0" style="white-space:pre-line;"><%= @listing.description %></p>
+        </div>
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+          <h6 class="fw-semibold mb-0">Recent Bookings</h6>
+          <%= link_to "All bookings →", host_bookings_path, class: "text-decoration-none small" %>
+        </div>
+        <% if @bookings.any? %>
+          <div class="list-group list-group-flush">
+            <% @bookings.each do |booking| %>
+              <%= link_to host_booking_path(booking), class: "list-group-item list-group-item-action px-4 py-2" do %>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="fw-semibold small"><%= booking.user.display_name %></span>
+                    <span class="text-muted small ms-2">
+                      <%= booking.start_time.strftime("%d %b %Y, %I:%M %p") %> –
+                      <%= booking.end_time.strftime("%I:%M %p") %>
+                    </span>
+                  </div>
+                  <div class="text-end">
+                    <% status_color = { "confirmed" => "success", "pending" => "warning text-dark",
+                                        "completed" => "secondary", "cancelled" => "danger" }[booking.status] || "secondary" %>
+                    <span class="badge bg-<%= status_color %> me-2"><%= booking.status.capitalize %></span>
+                    <span class="fw-bold small">₹<%= number_with_delimiter(booking.total_price.to_i) %></span>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="card-body text-muted small">No bookings yet.</div>
+        <% end %>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="col-lg-4">
+
+      <!-- Stats -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h6 class="fw-semibold mb-3">Stats</h6>
+          <div class="row g-2 text-center">
+            <div class="col-6">
+              <div class="bg-light rounded py-2">
+                <div class="h5 fw-bold mb-0"><%= @bookings.count %></div>
+                <div class="text-muted" style="font-size:0.75rem;">Bookings</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="bg-light rounded py-2">
+                <div class="h5 fw-bold mb-0"><%= @reviews.count %></div>
+                <div class="text-muted" style="font-size:0.75rem;">Reviews</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="bg-light rounded py-2">
+                <div class="h5 fw-bold mb-0">
+                  <%= @listing.avg_rating.present? ? @listing.avg_rating : "—" %>
+                </div>
+                <div class="text-muted" style="font-size:0.75rem;">Avg Rating</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="bg-light rounded py-2">
+                <div class="h5 fw-bold mb-0">
+                  ₹<%= number_with_delimiter(
+                        @bookings.select { |b| b.status == "completed" }
+                                 .sum(&:total_price).to_i) %>
+                </div>
+                <div class="text-muted" style="font-size:0.75rem;">Revenue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h6 class="fw-semibold mb-0">Guest Reviews</h6>
+        </div>
+        <% if @reviews.any? %>
+          <div class="list-group list-group-flush">
+            <% @reviews.each do |review| %>
+              <div class="list-group-item px-3 py-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-semibold small"><%= review.user.display_name %></span>
+                  <span class="star-rating small">
+                    <%= "★" * review.rating %><%= "☆" * (5 - review.rating) %>
+                  </span>
+                </div>
+                <p class="text-muted small mb-1 fst-italic">"<%= review.body %>"</p>
+                <span class="text-muted" style="font-size:0.7rem;">
+                  <%= review.created_at.strftime("%d %b %Y") %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="card-body text-muted small">No reviews yet.</div>
+        <% end %>
+      </div>
+
+    </div>
+  </div>
+</div>

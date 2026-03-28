@@ -1,0 +1,78 @@
+<% content_for :title, "Payment Gateway Settings — SpaceHub" %>
+
+<div class="container py-4" style="max-width: 720px;">
+  <h2 class="fw-bold mb-1">Payment Gateway Settings</h2>
+  <p class="text-muted mb-4">Configure your own Razorpay and Stripe credentials. Guests will pay using your account directly.</p>
+
+  <% [["razorpay", @razorpay, "Razorpay", "UPI, Cards, Net Banking (India)", "warning"],
+      ["stripe",   @stripe,   "Stripe",   "International Cards",              "primary"]].each do |key, config, name, desc, color| %>
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white d-flex align-items-center gap-3 py-3">
+        <span class="badge bg-<%= color %>"><%= name %></span>
+        <span class="text-muted small"><%= desc %></span>
+        <% if config.persisted? && config.active? %>
+          <span class="badge bg-success ms-auto">Active</span>
+        <% elsif config.persisted? %>
+          <span class="badge bg-secondary ms-auto">Inactive</span>
+        <% else %>
+          <span class="badge bg-light text-dark border ms-auto">Not configured</span>
+        <% end %>
+      </div>
+      <div class="card-body p-4">
+        <% if config.errors.any? %>
+          <div class="alert alert-danger py-2">
+            <ul class="mb-0 small">
+              <% config.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%= form_with url: upsert_host_gateway_configs_path, method: :post do |f| %>
+          <%= hidden_field_tag :gateway, key %>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <%= label_tag "gateway_config_key_id_#{key}",
+                    key == "razorpay" ? "Key ID (rzp_...)" : "Publishable Key (pk_...)",
+                    class: "form-label small fw-semibold" %>
+              <%= text_field_tag "gateway_config[key_id]",
+                    config.key_id,
+                    id: "gateway_config_key_id_#{key}",
+                    class: "form-control form-control-sm #{'is-invalid' if config.errors[:key_id].any?}",
+                    placeholder: key == "razorpay" ? "rzp_test_..." : "pk_test_..." %>
+            </div>
+            <div class="col-md-6">
+              <%= label_tag "gateway_config_key_secret_#{key}",
+                    key == "razorpay" ? "Key Secret" : "Secret Key (sk_...)",
+                    class: "form-label small fw-semibold" %>
+              <%= password_field_tag "gateway_config[key_secret]",
+                    config.key_secret,
+                    id: "gateway_config_key_secret_#{key}",
+                    class: "form-control form-control-sm #{'is-invalid' if config.errors[:key_secret].any?}",
+                    placeholder: "••••••••••••••••" %>
+            </div>
+          </div>
+
+          <div class="form-check mt-3">
+            <%= check_box_tag "gateway_config[active]", "1", config.active?,
+                  id: "gateway_active_#{key}", class: "form-check-input" %>
+            <%= label_tag "gateway_active_#{key}", "Enable #{name} for my listings",
+                  class: "form-check-label small" %>
+          </div>
+
+          <div class="mt-3">
+            <%= f.submit "Save #{name} Settings", class: "btn btn-#{color} btn-sm px-4" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="alert alert-info small">
+    <i class="bi bi-info-circle me-1"></i>
+    Your secret keys are stored securely and never exposed to guests.
+    If no custom credentials are saved, the platform's global keys are used as fallback.
+  </div>
+</div>

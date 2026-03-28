@@ -1,0 +1,50 @@
+<% content_for :title, "Edit Listing — Admin" %>
+
+<div class="container py-4" style="max-width:560px;">
+  <div class="mb-3">
+    <%= link_to "← Back", admin_listing_path(@listing), class: "btn btn-outline-secondary btn-sm" %>
+  </div>
+  <h2 class="fw-bold mb-4">Edit Listing</h2>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <%= form_with model: [:admin, @listing] do |f| %>
+        <%= render "shared/errors", resource: @listing %>
+
+        <div class="mb-3">
+          <%= f.label :title, class: "form-label fw-semibold" %>
+          <%= f.text_field :title, class: "form-control" %>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <%= f.label :category, class: "form-label fw-semibold" %>
+            <%= f.select :category, Listing::CATEGORIES.map { |c| [c.capitalize, c] }, {}, class: "form-select" %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :city, class: "form-label fw-semibold" %>
+            <%= f.select :city, Listing::CITIES, {}, class: "form-select" %>
+          </div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <%= f.label :price_per_hour, "Price/hr (₹)", class: "form-label fw-semibold" %>
+            <%= f.number_field :price_per_hour, class: "form-control" %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :capacity, class: "form-label fw-semibold" %>
+            <%= f.number_field :capacity, class: "form-control" %>
+          </div>
+        </div>
+        <div class="mb-4">
+          <%= f.label :status, class: "form-label fw-semibold" %>
+          <%= f.select :status, Listing::STATUSES.map { |s| [s.capitalize, s] }, {}, class: "form-select" %>
+        </div>
+
+        <div class="d-flex gap-2">
+          <%= f.submit "Save", class: "btn btn-warning fw-semibold px-4" %>
+          <%= link_to "Cancel", admin_listing_path(@listing), class: "btn btn-outline-secondary px-4" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

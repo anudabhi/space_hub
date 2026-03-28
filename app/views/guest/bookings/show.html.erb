@@ -1,0 +1,137 @@
+<% content_for :title, "Booking ##{@booking.id} — SpaceHub" %>
+
+<% status_color = { "confirmed" => "success", "pending" => "warning text-dark",
+                    "completed" => "secondary", "cancelled" => "danger" }[@booking.status] || "secondary" %>
+
+<div class="container py-4" style="max-width:680px;">
+  <div class="d-flex align-items-center mb-4 gap-3">
+    <%= link_to "← Back", guest_bookings_path, class: "btn btn-outline-secondary btn-sm" %>
+    <h2 class="fw-bold mb-0">Booking #<%= @booking.id %></h2>
+    <span class="badge bg-<%= status_color %> ms-auto fs-6"><%= @booking.status.capitalize %></span>
+  </div>
+
+  <!-- Booking details -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3"><%= @booking.listing.title %></h5>
+      <dl class="row mb-0">
+        <dt class="col-sm-4 text-muted fw-normal">Date</dt>
+        <dd class="col-sm-8"><%= @booking.start_time.strftime("%d %b %Y") %></dd>
+
+        <dt class="col-sm-4 text-muted fw-normal">Time</dt>
+        <dd class="col-sm-8">
+          <%= @booking.start_time.strftime("%I:%M %p") %> – <%= @booking.end_time.strftime("%I:%M %p") %>
+        </dd>
+
+        <dt class="col-sm-4 text-muted fw-normal">Duration</dt>
+        <dd class="col-sm-8"><%= @booking.hours_duration %> hrs</dd>
+
+        <dt class="col-sm-4 text-muted fw-normal">Amount</dt>
+        <dd class="col-sm-8 fw-bold">₹<%= number_with_delimiter(@booking.total_price.to_i) %></dd>
+
+        <% if @booking.payment_gateway.present? %>
+          <dt class="col-sm-4 text-muted fw-normal">Payment via</dt>
+          <dd class="col-sm-8"><%= @booking.payment_gateway.capitalize %></dd>
+        <% end %>
+
+        <dt class="col-sm-4 text-muted fw-normal">Location</dt>
+        <dd class="col-sm-8"><%= @booking.listing.address %>, <%= @booking.listing.city %></dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Pending: payment or manual confirmation -->
+  <% if @booking.status == "pending" %>
+    <% if @booking.payment_gateway.present? %>
+      <div class="card border-warning mb-4">
+        <div class="card-body p-4 text-center">
+          <h6 class="fw-semibold mb-1">Complete Payment to Confirm Booking</h6>
+          <p class="text-muted small mb-3">Your slot is reserved for 15 minutes.</p>
+
+          <% if @booking.payment_gateway == "razorpay" %>
+            <div data-controller="razorpay"
+                 data-razorpay-booking-id-value="<%= @booking.id %>"
+                 data-razorpay-description-value="<%= j @booking.listing.title %>">
+              <button class="btn btn-warning fw-semibold px-5"
+                      data-action="click->razorpay#pay">
+                <i class="bi bi-credit-card me-1"></i>
+                Pay ₹<%= number_with_delimiter(@booking.total_price.to_i) %> via Razorpay
+              </button>
+            </div>
+          <% else %>
+            <div data-controller="stripe"
+                 data-stripe-booking-id-value="<%= @booking.id %>">
+              <button class="btn btn-primary fw-semibold px-5"
+                      data-action="click->stripe#pay">
+                <i class="bi bi-credit-card me-1"></i>
+                Pay ₹<%= number_with_delimiter(@booking.total_price.to_i) %> via Stripe
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="card border-info mb-4">
+        <div class="card-body p-4 text-center">
+          <div class="fs-2 mb-2">⏳</div>
+          <h6 class="fw-semibold mb-1">Awaiting Host Confirmation</h6>
+          <p class="text-muted small mb-0">
+            This listing uses manual confirmation. The host will review your request and confirm shortly.
+            You'll receive an email once confirmed.
+          </p>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <!-- Confirmed -->
+  <% if @booking.status == "confirmed" %>
+    <div class="card border-success mb-4">
+      <div class="card-body p-4 text-center">
+        <div class="fs-2 mb-2">✅</div>
+        <h6 class="fw-semibold mb-1">Booking Confirmed</h6>
+        <p class="text-muted small mb-0">
+          Show this page at the venue on <%= @booking.start_time.strftime("%d %b") %>.
+        </p>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Completed + reviewable -->
+  <% if @booking.status == "completed" && @booking.reviewable? %>
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-3">Leave a Review</h6>
+        <%= form_with url: listing_reviews_path(@booking.listing), method: :post do |f| %>
+          <%= hidden_field_tag :booking_id, @booking.id %>
+          <div class="mb-3">
+            <%= f.select :rating, (1..5).map { |n| ["#{"★" * n} #{n}", n] },
+                  { include_blank: "Select rating" }, class: "form-select form-select-sm" %>
+          </div>
+          <div class="mb-3">
+            <%= f.text_area :body, rows: 3, class: "form-control form-control-sm",
+                  placeholder: "Share your experience…" %>
+          </div>
+          <%= f.submit "Submit Review", class: "btn btn-warning btn-sm" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Cancel action -->
+  <% if @booking.status.in?(%w[pending confirmed]) && @booking.start_time > Time.current %>
+    <div class="text-center">
+      <%= link_to cancel_guest_booking_path(@booking),
+            data: { turbo_method: :patch, turbo_confirm: "Cancel this booking?" },
+            class: "btn btn-outline-danger btn-sm" do %>
+        <i class="bi bi-x-circle me-1"></i> Cancel Booking
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% if @booking.payment_gateway == "razorpay" && @booking.status == "pending" %>
+  <% content_for :head do %>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <% end %>
+<% end %>

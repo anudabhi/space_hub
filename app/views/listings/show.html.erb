@@ -1,0 +1,196 @@
+<% content_for :title, "#{@listing.title} — SpaceHub India" %>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "Browse", listings_path %></li>
+      <li class="breadcrumb-item"><%= link_to @listing.category.capitalize, listings_path(category: @listing.category) %></li>
+      <li class="breadcrumb-item active"><%= @listing.title %></li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Left: photos + details -->
+    <div class="col-lg-8">
+      <!-- Photos -->
+      <% if @listing.photos.attached? %>
+        <div id="listingCarousel" class="carousel slide rounded-3 overflow-hidden shadow mb-4" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <% @listing.photos.each_with_index do |photo, i| %>
+              <div class="carousel-item <%= i == 0 ? "active" : "" %>">
+                <%= image_tag photo, class: "d-block w-100", style: "height:420px;object-fit:cover;", alt: @listing.title %>
+              </div>
+            <% end %>
+          </div>
+          <% if @listing.photos.count > 1 %>
+            <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center mb-4" style="height:320px;">
+          <span style="font-size:5rem;">
+            <%= @listing.category == "wellness" ? "🧘" : @listing.category == "creative" ? "🎨" : "🎉" %>
+          </span>
+        </div>
+      <% end %>
+
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <span class="badge bg-secondary text-capitalize me-2"><%= @listing.category %></span>
+          <span class="text-muted small"><i class="bi bi-geo-alt"></i> <%= @listing.city %></span>
+        </div>
+        <% if @listing.avg_rating.to_f > 0 %>
+          <div class="text-warning fw-semibold">
+            ★ <%= @listing.avg_rating %>
+            <span class="text-muted small fw-normal">(<%= @listing.reviews_count %> reviews)</span>
+          </div>
+        <% end %>
+      </div>
+
+      <h1 class="h2 fw-bold mb-3"><%= @listing.title %></h1>
+      <p class="text-muted small mb-3">
+        Hosted by
+        <%= link_to @listing.user.display_name, host_path(@listing.user),
+              class: "fw-semibold text-decoration-none text-dark" %>
+      </p>
+      <p class="text-muted mb-4" style="white-space:pre-wrap;"><%= @listing.description %></p>
+
+      <div class="d-flex gap-4 mb-4 flex-wrap">
+        <div><i class="bi bi-people text-secondary"></i> <strong>Up to <%= @listing.capacity %></strong> people</div>
+        <div><i class="bi bi-cash text-secondary"></i> <strong>₹<%= number_with_delimiter(@listing.price_per_hour.to_i) %></strong>/hour</div>
+        <% if @listing.address.present? %>
+          <div><i class="bi bi-map text-secondary"></i> <%= @listing.address %></div>
+        <% end %>
+      </div>
+
+      <% if @listing.amenities.present? %>
+        <h5 class="fw-semibold mb-3">Amenities</h5>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <% @listing.amenities.split(",").map(&:strip).each do |amenity| %>
+            <span class="badge bg-light text-dark border"><%= amenity %></span>
+          <% end %>
+        </div>
+      <% end %>
+
+      <!-- Reviews -->
+      <h5 class="fw-semibold mb-3">Reviews (<%= @reviews.count %>)</h5>
+      <% if @reviews.any? %>
+        <% @reviews.each do |review| %>
+          <div class="card border-0 bg-light mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-1">
+                <strong><%= review.user.display_name %></strong>
+                <span class="text-warning">#{"★" * review.rating}#{"☆" * (5 - review.rating)}</span>
+              </div>
+              <p class="mb-0 small"><%= review.body %></p>
+              <p class="text-muted small mb-0 mt-1"><%= review.created_at.strftime("%b %Y") %></p>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="text-muted">No reviews yet. Be the first!</p>
+      <% end %>
+
+      <!-- Leave a review -->
+      <% if user_signed_in? %>
+        <% completed_booking = current_user.bookings.find_by(listing: @listing, status: "completed") %>
+        <% if completed_booking && completed_booking.review.nil? %>
+          <div class="card border-warning mt-4">
+            <div class="card-body">
+              <h6 class="fw-semibold mb-3">Leave a Review</h6>
+              <%= form_with url: listing_reviews_path(@listing), method: :post do |f| %>
+                <div class="mb-3">
+                  <label class="form-label">Rating</label>
+                  <div class="d-flex gap-2">
+                    <% [1,2,3,4,5].each do |n| %>
+                      <div class="form-check form-check-inline">
+                        <%= f.radio_button :rating, n, class: "form-check-input", id: "rating_#{n}" %>
+                        <label class="form-check-label" for="rating_#{n}"><%= "★" * n %></label>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <%= f.text_area :body, rows: 3, placeholder: "Share your experience...", class: "form-control" %>
+                </div>
+                <%= f.submit "Submit Review", class: "btn btn-warning fw-semibold" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Right: booking widget -->
+    <div class="col-lg-4">
+      <div class="card shadow border-0 sticky-top" style="top:80px;">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <h4 class="fw-bold mb-0">₹<%= number_with_delimiter(@listing.price_per_hour.to_i) %></h4>
+            <span class="text-muted">/hour</span>
+          </div>
+
+          <% if user_signed_in? %>
+            <%= form_with url: listing_bookings_path(@listing), model: @booking, class: "needs-validation" do |f| %>
+              <div class="mb-3">
+                <%= f.label :start_time, "Start Date & Time", class: "form-label fw-semibold" %>
+                <%= f.datetime_local_field :start_time, class: "form-control", required: true, min: Time.current.strftime("%Y-%m-%dT%H:%M") %>
+              </div>
+              <div class="mb-3">
+                <%= f.label :end_time, "End Date & Time", class: "form-label fw-semibold" %>
+                <%= f.datetime_local_field :end_time, class: "form-control", required: true %>
+              </div>
+              <% if @available_gateways.any? %>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Pay with</label>
+                  <div class="d-flex gap-3">
+                    <% @available_gateways.each_with_index do |gw, i| %>
+                      <div class="form-check">
+                        <%= f.radio_button :payment_gateway, gw,
+                              checked: i == 0,
+                              class: "form-check-input",
+                              id: "gateway_#{gw}" %>
+                        <label class="form-check-label" for="gateway_<%= gw %>">
+                          <% if gw == "razorpay" %>
+                            <i class="bi bi-credit-card-2-front text-warning me-1"></i> Razorpay
+                          <% else %>
+                            <i class="bi bi-credit-card text-primary me-1"></i> Stripe
+                          <% end %>
+                        </label>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% else %>
+                <div class="alert alert-info py-2 small mb-3">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Host confirms manually — no online payment required.
+                </div>
+              <% end %>
+              <%= f.submit @available_gateways.any? ? "Book & Pay" : "Request Booking",
+                    class: "btn btn-warning w-100 fw-semibold py-2" %>
+            <% end %>
+          <% else %>
+            <div class="text-center">
+              <p class="text-muted mb-3">Sign in to book this space</p>
+              <%= link_to "Sign In to Book", new_user_session_path, class: "btn btn-dark w-100 fw-semibold" %>
+              <p class="text-muted small mt-2">Don't have an account? <%= link_to "Join free", new_user_registration_path %></p>
+            </div>
+          <% end %>
+
+          <div class="mt-3 pt-3 border-top">
+            <div class="d-flex gap-3 text-muted small justify-content-center">
+              <span><i class="bi bi-shield-check"></i> Secure payment</span>
+              <span><i class="bi bi-clock"></i> Instant booking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

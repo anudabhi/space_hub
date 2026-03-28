@@ -1,0 +1,55 @@
+<div class="container py-5" style="max-width:480px;">
+  <div class="card shadow border-0">
+    <div class="card-body p-4">
+      <h2 class="fw-bold text-center mb-1">Create your account</h2>
+      <p class="text-muted text-center mb-4 small">Join SpaceHub — free forever</p>
+
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <div class="mb-3">
+          <%= f.label :name, class: "form-label fw-semibold" %>
+          <%= f.text_field :name, autofocus: true, class: "form-control", placeholder: "Your full name" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :email, class: "form-label fw-semibold" %>
+          <%= f.email_field :email, autocomplete: "email", class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :city, class: "form-label fw-semibold" %>
+          <%= f.select :city, options_for_select([""] + Listing::CITIES), {}, class: "form-select" %>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">I want to</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <%= f.radio_button :role, "guest", checked: true, class: "form-check-input" %>
+              <label class="form-check-label">Book spaces (Guest)</label>
+            </div>
+            <div class="form-check">
+              <%= f.radio_button :role, "host", class: "form-check-input" %>
+              <label class="form-check-label">List my space (Host)</label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <%= f.label :password, class: "form-label fw-semibold" %>
+          <% if @minimum_password_length %>
+            <small class="text-muted ms-1">(<%= @minimum_password_length %> characters minimum)</small>
+          <% end %>
+          <%= f.password_field :password, autocomplete: "new-password", class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :password_confirmation, class: "form-label fw-semibold" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control" %>
+        </div>
+        <%= f.submit "Create Account", class: "btn btn-warning w-100 fw-semibold py-2" %>
+      <% end %>
+
+      <hr class="my-3">
+      <div class="text-center small">
+        <%= render "devise/shared/links" %>
+      </div>
+    </div>
+  </div>
+</div>

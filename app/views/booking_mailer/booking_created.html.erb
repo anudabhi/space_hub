@@ -1,0 +1,11 @@
+<h2>Booking Request Received</h2>
+<p>Hi <%= @guest.display_name %>,</p>
+<p>Your booking request for <strong><%= @listing.title %></strong> has been received.</p>
+<ul>
+  <li><strong>Date:</strong> <%= @booking.start_time.strftime("%d %b %Y") %></li>
+  <li><strong>Time:</strong> <%= @booking.start_time.strftime("%I:%M %p") %> – <%= @booking.end_time.strftime("%I:%M %p") %></li>
+  <li><strong>Duration:</strong> <%= @booking.hours_duration %> hours</li>
+  <li><strong>Total:</strong> ₹<%= number_with_delimiter(@booking.total_price.to_i) %></li>
+</ul>
+<p>Please complete your payment to confirm the booking.</p>
+<p><a href="<%= guest_booking_url(@booking) %>">View Booking & Pay</a></p>

@@ -1,0 +1,70 @@
+<% content_for :title, "Availability — #{@listing.title}" %>
+
+<div class="container py-4">
+  <div class="mb-4">
+    <%= link_to "← Back to Listings", host_listings_path, class: "btn btn-outline-secondary btn-sm" %>
+    <h2 class="fw-bold mt-2">Availability: <%= @listing.title %></h2>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h5 class="fw-semibold mb-3">Add Time Slot</h5>
+          <%= form_with model: [@listing, @availability], url: host_listing_availabilities_path(@listing) do |f| %>
+            <%= render "shared/errors", resource: @availability %>
+            <div class="mb-3">
+              <%= f.label :date, class: "form-label fw-semibold" %>
+              <%= f.date_field :date, class: "form-control", min: Date.today %>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col">
+                <%= f.label :start_time, "Start", class: "form-label fw-semibold" %>
+                <%= f.time_field :start_time, class: "form-control" %>
+              </div>
+              <div class="col">
+                <%= f.label :end_time, "End", class: "form-label fw-semibold" %>
+                <%= f.time_field :end_time, class: "form-control" %>
+              </div>
+            </div>
+            <div class="mb-3 form-check">
+              <%= f.check_box :is_available, class: "form-check-input", checked: true %>
+              <%= f.label :is_available, "Available", class: "form-check-label" %>
+            </div>
+            <%= f.submit "Add Slot", class: "btn btn-warning fw-semibold w-100" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <h5 class="fw-semibold mb-3">Scheduled Slots</h5>
+      <% if @availabilities.any? %>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead class="table-light">
+              <tr><th>Date</th><th>Start</th><th>End</th><th>Available</th><th></th></tr>
+            </thead>
+            <tbody>
+              <% @availabilities.each do |slot| %>
+                <tr>
+                  <td><%= slot.date.strftime("%d %b %Y") %></td>
+                  <td><%= slot.start_time.strftime("%I:%M %p") %></td>
+                  <td><%= slot.end_time.strftime("%I:%M %p") %></td>
+                  <td><%= slot.is_available ? "✅" : "❌" %></td>
+                  <td>
+                    <%= link_to "Remove", host_listing_availability_path(@listing, slot),
+                          data: { turbo_method: :delete, turbo_confirm: "Remove this slot?" },
+                          class: "btn btn-outline-danger btn-sm" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-muted">No time slots yet. Add your available hours above.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

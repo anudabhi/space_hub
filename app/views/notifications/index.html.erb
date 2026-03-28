@@ -1,0 +1,47 @@
+<% content_for :title, "Notifications — SpaceHub" %>
+
+<div class="container py-4" style="max-width:640px;">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Notifications</h2>
+    <% if @notifications.any? { |n| !n.read? } %>
+      <%= button_to "Mark all read", mark_all_read_notifications_path,
+            method: :patch, class: "btn btn-outline-secondary btn-sm" %>
+    <% end %>
+  </div>
+
+  <% if @notifications.any? %>
+    <div class="list-group shadow-sm">
+      <% @notifications.each do |notif| %>
+        <%= link_to mark_read_notification_path(notif), method: :patch,
+              data: { turbo_method: :patch },
+              class: "list-group-item list-group-item-action px-4 py-3 #{'bg-warning bg-opacity-10' unless notif.read?}" do %>
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="d-flex align-items-start gap-3">
+              <% icon = { "booking_created" => "bi-calendar-plus text-warning",
+                          "booking_confirmed" => "bi-check-circle text-success",
+                          "booking_completed" => "bi-star text-primary",
+                          "booking_cancelled" => "bi-x-circle text-danger" }[notif.kind] || "bi-bell text-secondary" %>
+              <i class="bi <%= icon %> mt-1" style="font-size:1.2rem;"></i>
+              <div>
+                <p class="mb-0 small <%= notif.read? ? 'text-muted' : 'fw-semibold' %>">
+                  <%= notif.message %>
+                </p>
+                <span class="text-muted" style="font-size:0.75rem;">
+                  <%= time_ago_in_words(notif.created_at) %> ago
+                </span>
+              </div>
+            </div>
+            <% unless notif.read? %>
+              <span class="badge bg-warning rounded-pill align-self-center flex-shrink-0">New</span>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-5 text-muted">
+      <div class="display-4 mb-3">🔔</div>
+      <p>No notifications yet.</p>
+    </div>
+  <% end %>
+</div>
