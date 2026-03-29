@@ -1,5 +1,4 @@
 class Host::DashboardController < HostApplicationController
-
   def index
     @listings = current_user.listings.order(created_at: :desc)
 

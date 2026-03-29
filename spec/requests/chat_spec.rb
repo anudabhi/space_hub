@@ -25,7 +25,7 @@ RSpec.describe "Chat", type: :request do
         allow(GeminiService).to receive(:chat).and_return("How can I help?")
 
         post chat_message_path,
-             params:  { message: "What's in Mumbai?", history: [{ role: "user", content: "Hi" }] }.to_json,
+             params:  { message: "What's in Mumbai?", history: [ { role: "user", content: "Hi" } ] }.to_json,
              headers: { "Content-Type" => "application/json" }
 
         expect(GeminiService).to have_received(:chat).with(

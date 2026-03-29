@@ -57,15 +57,15 @@ class PaymentsController < UserApplicationController
 
     session = Stripe::Checkout::Session.create(
       {
-        payment_method_types: ["card"],
-        line_items: [{
+        payment_method_types: [ "card" ],
+        line_items: [ {
           price_data: {
             currency: "inr",
             product_data: { name: booking.listing.title },
             unit_amount: (booking.total_price * 100).to_i
           },
           quantity: 1
-        }],
+        } ],
         mode: "payment",
         success_url: stripe_success_url(booking_id: booking.id, session_id: "{CHECKOUT_SESSION_ID}"),
         cancel_url: stripe_cancel_url(booking_id: booking.id),

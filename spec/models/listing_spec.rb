@@ -71,12 +71,12 @@ RSpec.describe Listing, type: :model do
   # ── accepted_gateways_list ──────────────────────────────────────────────────
   describe "#accepted_gateways_list" do
     it "returns intersection of stored gateways and valid GATEWAYS" do
-      listing = build(:listing, accepted_gateways: ["razorpay", "stripe"])
+      listing = build(:listing, accepted_gateways: [ "razorpay", "stripe" ])
       expect(listing.accepted_gateways_list).to contain_exactly("razorpay", "stripe")
     end
 
     it "filters out invalid gateway values" do
-      listing = build(:listing, accepted_gateways: ["razorpay", "paypal"])
+      listing = build(:listing, accepted_gateways: [ "razorpay", "paypal" ])
       expect(listing.accepted_gateways_list).to contain_exactly("razorpay")
     end
 

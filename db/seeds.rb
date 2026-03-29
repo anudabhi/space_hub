@@ -235,7 +235,7 @@ puts "  ✓ #{Listing.count} listings created"
 
 # ─── Bookings ─────────────────────────────────────────────────────────────────
 
-guests   = [guest, guest2, guest3, guest4]
+guests   = [ guest, guest2, guest3, guest4 ]
 all_listings = Listing.all.to_a
 
 review_bodies = [
@@ -248,7 +248,7 @@ review_bodies = [
   "Very well maintained. The host provided excellent support throughout.",
   "Booked for a client session — they were blown away. Will be a regular here.",
   "Clean, professional, and exactly what we needed. Smooth experience overall.",
-  "The photos don't do it justice — even better in person. Highly recommended.",
+  "The photos don't do it justice — even better in person. Highly recommended."
 ]
 
 bookings_seed = [
@@ -279,7 +279,7 @@ bookings_seed = [
   { listing: all_listings[13], user: guest,  hours: 2, days_ago: -9,  status: "pending", gateway: "razorpay", payment_id: nil },
   # Cancelled
   { listing: all_listings[7],  user: guest2, hours: 2, days_ago: 35, status: "cancelled", gateway: "stripe",   payment_id: nil },
-  { listing: all_listings[9],  user: guest3, hours: 3, days_ago: 40, status: "cancelled", gateway: "razorpay", payment_id: nil },
+  { listing: all_listings[9],  user: guest3, hours: 3, days_ago: 40, status: "cancelled", gateway: "razorpay", payment_id: nil }
 ]
 
 bookings_seed.each_with_index do |b, i|
@@ -344,7 +344,7 @@ notifications_data = [
   { user: guest2, kind: "booking_completed",  read: true,  created_at: 6.days.ago,
     message: "Your booking at #{Listing.find_by(user: host2)&.title} is complete. Leave a review!" },
   { user: guest4, kind: "booking_completed",  read: false, created_at: 2.days.ago,
-    message: "Your booking at #{Listing.find_by(user: host3)&.title} is complete. Leave a review!" },
+    message: "Your booking at #{Listing.find_by(user: host3)&.title} is complete. Leave a review!" }
 ]
 
 notifications_data.each do |attrs|

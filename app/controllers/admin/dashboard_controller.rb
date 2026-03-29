@@ -1,5 +1,4 @@
 class Admin::DashboardController < AdminApplicationController
-
   def index
     @users_count    = User.count
     @listings_count = Listing.count

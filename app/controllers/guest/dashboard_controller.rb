@@ -1,5 +1,4 @@
 class Guest::DashboardController < GuestApplicationController
-
   def index
     @upcoming_bookings = current_user.bookings
                                      .includes(:listing)

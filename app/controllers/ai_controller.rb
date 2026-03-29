@@ -1,5 +1,4 @@
 class AiController < UserApplicationController
-
   def generate_description
     title     = params[:title].to_s.strip
     category  = params[:category].to_s

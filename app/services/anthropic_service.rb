@@ -30,7 +30,7 @@ class AnthropicService
       body: {
         model: MODEL,
         max_tokens: 400,
-        messages: [{ role: "user", content: prompt }]
+        messages: [ { role: "user", content: prompt } ]
       }.to_json
     )
 

@@ -9,7 +9,7 @@ RSpec.describe BookingMailer, type: :mailer do
     end
 
     it "sends to the guest" do
-      expect(mail.to).to eq([booking.user.email])
+      expect(mail.to).to eq([ booking.user.email ])
     end
 
     it "includes the total price" do
@@ -21,7 +21,7 @@ RSpec.describe BookingMailer, type: :mailer do
     let(:mail) { described_class.host_new_booking(booking) }
 
     it "sends to the host" do
-      expect(mail.to).to eq([booking.listing.user.email])
+      expect(mail.to).to eq([ booking.listing.user.email ])
     end
 
     it "includes the guest name" do
@@ -33,7 +33,7 @@ RSpec.describe BookingMailer, type: :mailer do
     let(:mail) { described_class.booking_confirmed(booking) }
 
     it "sends to the guest" do
-      expect(mail.to).to eq([booking.user.email])
+      expect(mail.to).to eq([ booking.user.email ])
     end
 
     it "includes confirmed message" do

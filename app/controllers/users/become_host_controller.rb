@@ -1,5 +1,4 @@
 class Users::BecomeHostController < UserApplicationController
-
   def update
     if current_user.guest?
       current_user.update!(role: "host")

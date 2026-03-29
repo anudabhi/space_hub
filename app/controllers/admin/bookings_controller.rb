@@ -1,5 +1,4 @@
 class Admin::BookingsController < AdminApplicationController
-
   def index
     @pagy, @bookings = pagy(Booking.includes(:listing, :user).order(created_at: :desc))
   end
