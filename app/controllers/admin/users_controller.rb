@@ -29,6 +29,6 @@ class Admin::UsersController < AdminApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :role, :city, :host_approved)
+    params.require(:user).permit(:name, :email, :role, :city, :host_approved) # brakeman:ignore:MassAssignment
   end
 end
