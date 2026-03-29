@@ -30,7 +30,7 @@ class GeminiService
     contents << { role: "user", parts: [ { text: message } ] }
 
     response = HTTParty.post(
-      "#{API_URL}?key=#{ENV.fetch('GEMINI_API_KEY', '')}",
+      "#{API_URL}?key=#{Rails.application.credentials.gemini_api_key}",
       headers: { "Content-Type" => "application/json" },
       body: {
         system_instruction: { parts: [ { text: SYSTEM_PROMPT } ] },
@@ -60,7 +60,7 @@ class GeminiService
     PROMPT
 
     response = HTTParty.post(
-      "#{API_URL}?key=#{ENV.fetch('GEMINI_API_KEY', '')}",
+      "#{API_URL}?key=#{Rails.application.credentials.gemini_api_key}",
       headers: { "Content-Type" => "application/json" },
       body: {
         contents: [ { parts: [ { text: prompt } ] } ],

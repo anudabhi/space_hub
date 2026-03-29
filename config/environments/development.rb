@@ -29,7 +29,7 @@ Rails.application.configure do
   config.cache_store = :memory_store
 
   # Use S3 if credentials are set, otherwise fall back to local disk.
-  config.active_storage.service = ENV["AWS_S3_BUCKET"].present? ? :amazon : :local
+  config.active_storage.service = Rails.application.credentials.dig(:aws, :bucket).present? ? :amazon : :local
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
