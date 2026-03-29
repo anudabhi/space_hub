@@ -22,15 +22,14 @@ RSpec.describe "Hosts", type: :request do
     end
 
     it "does not show draft listings" do
-      draft = create(:listing, user: host, :draft)
+      draft = create(:listing, :draft, user: host)
       get host_path(host)
       expect(response.body).not_to include(draft.title)
     end
 
     it "returns 404 for a non-host user" do
-      expect {
-        get host_path(guest)
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      get host_path(guest)
+      expect(response).to have_http_status(:not_found)
     end
   end
 end
